@@ -34,3 +34,5 @@ FastAPI 기반의 도로 위험 요소(포트홀, 도로 균열, 장애물 등) 
 pip install -r requirements.txt
 # 또는
 pip install fastapi uvicorn pydantic
+#
+py -m pip install -r requirements.txt
