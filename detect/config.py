@@ -15,7 +15,7 @@ LEGACY_NAMES = {
 }
 
 HAZARD_MODEL = "best.pt"        # 직접 학습한 도로 위험 모델
-HAZARD_CONF = 0.40              # 이 값보다 낮은 박스는 버린다
+HAZARD_CONF = 0.25              # 이 값보다 낮은 박스는 버린다
 
 # 인파(crowd): 사전학습 모델의 person 수로 판정한다 (학습 클래스 아님)
 PERSON_MODEL = "yolov8n.pt"
