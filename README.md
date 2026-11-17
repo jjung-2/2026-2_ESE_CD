@@ -56,15 +56,19 @@
 2026-2_ESE_CD/
 │
 ├── detect/
-│   ├── best.pt
-│   ├── webcam_test.py
-│   └── yolov8n.pt
+│   ├── best.pt            # 직접 학습한 도로 위험 모델
+│   ├── config.py          # 인식 클래스·기준값 (type 이름은 docs/api.md 기준)
+│   └── webcam_test.py     # 도로 위험 + 인파 인식 확인
+│
+├── firmware/
+│   └── sensor_test/       # ESP32-S3 + MPU6050 + NEO-7M 동작 확인
 │
 ├── server/
 │   ├── main.py
 │   └── requirements.txt
 │
 ├── docs/
+│   └── api.md             # API 기준 문서 (모든 파트가 따름)
 │
 ├── map-alert/
 │
@@ -107,10 +111,10 @@ python webcam_test.py
 
 실행 시 다음 두 모델이 동시에 동작합니다.
 
-- `yolov8n.pt`: 일반 객체 탐지
-- `best.pt`: 포트홀 탐지
+- `best.pt`: 도로 위험(`pothole`, 추가 학습 후 `crack`, `puddle`) 탐지
+- `yolov8n.pt`: 사람(person)만 세어 인파(`crowd`) 판정. 그 외 클래스는 표시하지 않음
 
-웹캠 화면에 두 모델의 탐지 결과가 Bounding Box 형태로 표시됩니다.
+화면에 표시되는 이름은 서버의 위험 type 이름(`docs/api.md`)과 같습니다. 영상 파일로 시험하려면 `python webcam_test.py road.mp4`처럼 실행합니다.
 
 프로그램 종료는 `Q` 키를 사용합니다.
 
@@ -142,6 +146,15 @@ uvicorn main:app --reload
 http://127.0.0.1:8000/docs
 ```
 
+### 4. 센서 동작 확인 (ESP32-S3)
+
+`firmware/sensor_test/sensor_test.ino`를 Arduino IDE로 엽니다.
+
+- 보드: ESP32S3 Dev Module, 라이브러리: TinyGPSPlus
+- 배선: MPU6050 SDA→GPIO9, SCL→GPIO8 / NEO-7M TX→GPIO18, RX→GPIO17
+- 시리얼 모니터 속도 921600. 100Hz로 시간·GPS·가속도·자이로가 CSV 한 줄씩 출력됩니다.
+- 전원을 켠 뒤 1초 동안 움직이지 않으면 자이로 영점을 잡습니다.
+
 ---
 
 ## 🧠 모델 학습 정보
@@ -168,10 +181,12 @@ http://127.0.0.1:8000/docs
 | POST | `/events` | 도로 위험 요소 데이터 수신 |
 | GET | `/hazards` | 지정한 위치 주변 위험 요소 조회 |
 
+필드 이름(`lat`, `lon`, `time`, `event_id` 등)과 위험 type 목록은 [`docs/api.md`](docs/api.md)를 기준으로 합니다.
+
 ### 위험 요소 데이터 처리
 
 - GPS 위도 및 경도 수신
-- 차량 진행 방향과 오프셋을 이용한 위치 보정
+- 자전거 진행 방향과 오프셋을 이용한 위치 보정
 - 15m 이내 동일 유형의 위험 요소 중복 통합
 - 카메라와 IMU 데이터의 교차 검증
 - 누적 점수에 따른 위험 요소 상태 구분
