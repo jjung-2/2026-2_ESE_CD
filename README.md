@@ -58,7 +58,8 @@
 ├── detect/
 │   ├── best.pt            # 직접 학습한 도로 위험 모델
 │   ├── config.py          # 인식 클래스·기준값 (type 이름은 docs/api.md 기준)
-│   └── webcam_test.py     # 도로 위험 + 인파 인식 확인
+│   ├── webcam_test.py     # 도로 위험 + 인파 인식 확인
+│   └── train/             # 3클래스 학습 (Colab 노트북, 데이터 합치기 스크립트)
 │
 ├── firmware/
 │   └── sensor_test/       # ESP32-S3 + MPU6050 + NEO-7M 동작 확인
